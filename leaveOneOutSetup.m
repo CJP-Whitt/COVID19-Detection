@@ -1,7 +1,8 @@
 function full_patient_list = leaveOneOutSetup(patientNumber)
-% Function for creating file structure and contents for leave 'patientNumber' out
+%  LEAVEONEOUTSETUP Function for creating file structure and contents for leave 'patientNumber' 
+% out
+% 
 % validation
-
     % If the directory already exists, remove it
     if(isfolder('leave_out'))
         rmdir ('leave_out', 's');
@@ -62,7 +63,6 @@ function full_patient_list = leaveOneOutSetup(patientNumber)
     copyfile(fullfile(noncovid_images, '*'), train_noncovid_path);
 %% 
 % Code for filling folders with correct patient data
-
     k = patientNumber;
     patient_id = full_patient_list{k};
     
@@ -102,7 +102,7 @@ function full_patient_list = leaveOneOutSetup(patientNumber)
     if(isCOVID == 1)
         for i = 1:move_num
             file_name = images_to_move(i);
-            movefile(fullfile(train_covid_path, file_name), val_covid_path);
+            movefile(fullfile(train_covid_path, file_name + "*"), val_covid_path);
         end
         % Move dummy image to validation Covid
     end
@@ -111,7 +111,7 @@ function full_patient_list = leaveOneOutSetup(patientNumber)
     if(isCOVID == 0)
         for i = 1:move_num
             file_name = images_to_move(i);
-            movefile(fullfile(train_noncovid_path, file_name), val_noncovid_path);
+            movefile(fullfile(train_noncovid_path, file_name + "*"), val_noncovid_path);
         end
         % Move dummy image to validation nonCovid
     end
