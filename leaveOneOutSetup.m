@@ -1,6 +1,7 @@
-function leaveOneOutSetup(patientNumber)
+function full_patient_list = leaveOneOutSetup(patientNumber)
 % Function for creating file structure and contents for leave 'patientNumber' out
 % validation
+
     % If the directory already exists, remove it
     if(isfolder('leave_out'))
         rmdir ('leave_out', 's');
@@ -15,22 +16,22 @@ function leaveOneOutSetup(patientNumber)
     end
     
     % COVID Spreadsheet
-    COVID_sheet = readtable('COVID-CT-MetaInfo.xlsx');
+    COVID_sheet = readtable('COVID-CT-MetaInfo.xlsx','ReadVariableNames',false);
     % Get number of COVID images.
     covid_size = size(COVID_sheet,1);
     
     % NonCOVID Spreadsheet
-    nonCOVID_sheet = readtable('NonCOVID-CT-MetaInfo.csv');
+    nonCOVID_sheet = readtable('NonCOVID-CT-MetaInfo.csv','ReadVariableNames',false);
     % Get number of nonCOVID images.
     noncovid_size = size(nonCOVID_sheet,1);
     
     % COVID patient IDs
-    covid_patient_list = unique(COVID_sheet.PatientID);
+    covid_patient_list = unique(COVID_sheet.Var2);
     % Get rid of blank first cell.;
     covid_patient_list = covid_patient_list(2:end);
     
     % NonCOVID patient IDs
-    noncovid_patient_list = unique(nonCOVID_sheet.patientId);
+    noncovid_patient_list = unique(nonCOVID_sheet.Var3);
     
     % Create the full patient list by concatenating the two lists.
     full_patient_list = [covid_patient_list ; noncovid_patient_list];
@@ -61,12 +62,13 @@ function leaveOneOutSetup(patientNumber)
     copyfile(fullfile(noncovid_images, '*'), train_noncovid_path);
 %% 
 % Code for filling folders with correct patient data
+
     k = patientNumber;
     patient_id = full_patient_list{k};
     
     % Bool to check which spreadsheet we should look at.
     % Check for covid or noncovid patient.
-    if(ismember(patient_id, COVID_sheet.PatientID))
+    if(ismember(patient_id, COVID_sheet.Var2))
         isCOVID = 1;
     else
         isCOVID = 0;
@@ -78,8 +80,8 @@ function leaveOneOutSetup(patientNumber)
     % Go through the COVID images and get the images that need to be moved.
     if(isCOVID == 1)
         for i = 1:covid_size
-            if(strcmp(COVID_sheet.PatientID{i},patient_id) == 1)
-                images_to_move = [images_to_move ; COVID_sheet.FileName{i}];
+            if(strcmp(COVID_sheet.Var2{i},patient_id) == 1)
+                images_to_move = [images_to_move ; COVID_sheet.Var1{i}];
             end
         end
     end
@@ -87,8 +89,8 @@ function leaveOneOutSetup(patientNumber)
     % Go through the nonCOVID images and get the images that need to be moved.
     if(isCOVID == 0)
         for i = 1:noncovid_size
-            if(strcmp(nonCOVID_sheet.patientd{i},patient_id) == 1)
-                images_to_move = [images_to_move ; nonCOVID_sheet.imageName{i}];
+            if(strcmp(nonCOVID_sheet.Var3{i},patient_id) == 1)
+                images_to_move = [images_to_move ; nonCOVID_sheet.Var2{i}];
             end
         end
     end
@@ -102,6 +104,7 @@ function leaveOneOutSetup(patientNumber)
             file_name = images_to_move(i);
             movefile(fullfile(train_covid_path, file_name), val_covid_path);
         end
+        % Move dummy image to validation Covid
     end
     
     % Move the nonCOVID patient's images into the validation folder.
@@ -110,6 +113,7 @@ function leaveOneOutSetup(patientNumber)
             file_name = images_to_move(i);
             movefile(fullfile(train_noncovid_path, file_name), val_noncovid_path);
         end
+        % Move dummy image to validation nonCovid
     end
     
 end %End Function
