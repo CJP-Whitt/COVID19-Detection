@@ -1,4 +1,4 @@
-function full_patient_list = leaveOneOutSetup(patientNumber)
+function [full_patient_list, isCOVID] = leaveOneOutSetup(patientNumber)
 %  LEAVEONEOUTSETUP Function for creating file structure and contents for leave 'patientNumber' 
 % out
 % 
