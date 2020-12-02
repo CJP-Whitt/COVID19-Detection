@@ -1,4 +1,3 @@
-
 function JakobVersioncovid19Detection_SVM_densenet201()
 
 %% *Covid Detection Transfer Learning (densenet201)*
@@ -170,3 +169,4 @@ avg_f_score
 %end
 
 end
+
