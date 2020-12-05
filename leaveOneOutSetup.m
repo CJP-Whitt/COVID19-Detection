@@ -63,57 +63,60 @@ function [full_patient_list, isCOVID] = leaveOneOutSetup(patientNumber)
     copyfile(fullfile(noncovid_images, '*'), train_noncovid_path);
 %% 
 % Code for filling folders with correct patient data
-    k = patientNumber;
-    patient_id = full_patient_list{k};
-    
-    % Bool to check which spreadsheet we should look at.
-    % Check for covid or noncovid patient.
-    if(ismember(patient_id, COVID_sheet.Var2))
-        isCOVID = 1;
+    if (patientNumber ~= 0)
+        k = patientNumber;
+        patient_id = full_patient_list{k};
+
+        % Bool to check which spreadsheet we should look at.
+        % Check for covid or noncovid patient.
+        if(ismember(patient_id, COVID_sheet.Var2))
+            isCOVID = 1;
+        else
+            isCOVID = 0;
+        end
+
+        % Find all images associated with the patient.
+        images_to_move = strings(0);
+
+        % Go through the COVID images and get the images that need to be moved.
+        if(isCOVID == 1)
+            for i = 1:covid_size
+                if(strcmp(COVID_sheet.Var2{i},patient_id) == 1)
+                    images_to_move = [images_to_move ; COVID_sheet.Var1{i}];
+                end
+            end
+        end
+
+        % Go through the nonCOVID images and get the images that need to be moved.
+        if(isCOVID == 0)
+            for i = 1:noncovid_size
+                if(strcmp(nonCOVID_sheet.Var3{i},patient_id) == 1)
+                    images_to_move = [images_to_move ; nonCOVID_sheet.Var2{i}];
+                end
+            end
+        end
+
+        % Get number of images to move.
+        move_num = size(images_to_move,1);
+
+        % Move the COVID patient's images into the validation folder.
+        if(isCOVID == 1)
+            for i = 1:move_num
+                file_name = images_to_move(i);
+                movefile(fullfile(train_covid_path, file_name + "*"), val_covid_path);
+            end
+            % Move dummy image to validation Covid
+        end
+
+        % Move the nonCOVID patient's images into the validation folder.
+        if(isCOVID == 0)
+            for i = 1:move_num
+                file_name = images_to_move(i);
+                movefile(fullfile(train_noncovid_path, file_name + "*"), val_noncovid_path);
+            end
+            % Move dummy image to validation nonCovid
+        end
     else
-        isCOVID = 0;
+        isCOVID = 1;
     end
-    
-    % Find all images associated with the patient.
-    images_to_move = strings(0);
-    
-    % Go through the COVID images and get the images that need to be moved.
-    if(isCOVID == 1)
-        for i = 1:covid_size
-            if(strcmp(COVID_sheet.Var2{i},patient_id) == 1)
-                images_to_move = [images_to_move ; COVID_sheet.Var1{i}];
-            end
-        end
-    end
-    
-    % Go through the nonCOVID images and get the images that need to be moved.
-    if(isCOVID == 0)
-        for i = 1:noncovid_size
-            if(strcmp(nonCOVID_sheet.Var3{i},patient_id) == 1)
-                images_to_move = [images_to_move ; nonCOVID_sheet.Var2{i}];
-            end
-        end
-    end
-    
-    % Get number of images to move.
-    move_num = size(images_to_move,1);
-    
-    % Move the COVID patient's images into the validation folder.
-    if(isCOVID == 1)
-        for i = 1:move_num
-            file_name = images_to_move(i);
-            movefile(fullfile(train_covid_path, file_name + "*"), val_covid_path);
-        end
-        % Move dummy image to validation Covid
-    end
-    
-    % Move the nonCOVID patient's images into the validation folder.
-    if(isCOVID == 0)
-        for i = 1:move_num
-            file_name = images_to_move(i);
-            movefile(fullfile(train_noncovid_path, file_name + "*"), val_noncovid_path);
-        end
-        % Move dummy image to validation nonCovid
-    end
-    
 end %End Function
