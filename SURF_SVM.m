@@ -1,11 +1,8 @@
 
 function SURF_SVM()
 
-
-imdsTest = imageDatastore(fullfile('ucsd_Data','test'),'IncludeSubfolders',true,'LabelSource','foldernames');
-imdsTrain = imageDatastore(fullfile('ucsd_Data',{'train','validation'}),'IncludeSubfolders',true,'LabelSource','foldernames');
-
-
+imdsTest = imageDatastore(fullfile('COVID19_CT_seg_20cases_DUMMY', 'test'),'IncludeSubfolders',true,'LabelSource','foldernames');
+imdsTrain = imageDatastore(fullfile('UCSD_combined', 'train'),'IncludeSubfolders',true,'LabelSource','foldernames');
 
 bag = bagOfFeatures(imdsTrain);
 
@@ -15,13 +12,11 @@ featuresVector = encode(bag, imageForBarChart);
 figure
 bar(featuresVector)
 title('freq histogram training patient 1')
-xlabel('features')
-ylabel('frequency')
+xlabel('visual word index')
+ylabel('word count')
 
 
-
-
-optionsSVM = templateSVM('KernelFunction', 'rbf', 'KernelScale', 'auto','Standardize', true)
+optionsSVM = templateSVM('KernelFunction', 'rbf', 'KernelScale', 'auto', 'Standardize', true)
 
 
 categoryClassifier = trainImageCategoryClassifier(imdsTrain, bag,'LearnerOptions', optionsSVM);
@@ -67,9 +62,6 @@ disp("CORRECT LABEL BELOW:")
 
 imdsTrain.Labels(2)
 
-
-
-
 disp("Testing test image 3 on classifier")
 [labelIdx, scores] = predict(categoryClassifier, Test3);
 % Display the string label
@@ -77,13 +69,9 @@ categoryClassifier.Labels(labelIdx)
 disp("CORRECT LABEL BELOW:")
 
 imdsTrain.Labels(3)
-
-
-
 disp("<------------------------------------------------------------------------------>")
-
-
 disp("USING testing IMAGES FOR TESTING")
+disp("USING testing IMAGES FOR predict (after extracting features from training")
 
 
 
@@ -100,10 +88,6 @@ disp("USING THE TESTING IMAGES FOR TESTING")
 categoryClassifier.Labels(labelIdx)
 disp("CORRECT LABEL BELOW:")
 imdsTest.Labels(1)
-
-
-
-
 
 
 disp("Testing test image 2 on classifier")
@@ -125,11 +109,6 @@ disp("CORRECT LABEL BELOW:")
 
 imdsTest.Labels(3)
 
-
-
-
-
-
 disp("<------------------------------------------------------------------------------>")
 
 
@@ -142,6 +121,11 @@ plot(points.selectStrongest(10));
 title("Training image 1")
 
 
+figure
+imshow(SURF_TEST); hold on;
+plot(points.selectStrongest(40));
+title("Training image COVID")
+imdsTrain.Labels(1)
 
 
 
@@ -158,18 +142,29 @@ disp("YTEST:")
 size(YTest)
 class(YTest)
 
+
 % Calculate accuracy.
 % accuracy = mean(YPred == YTest);
 
 % Get confusion matrix values.
 conf_values = confusionmat(YTest, YPred);
+YPred_cat = categorical(YPred)
+YPred_cat(YPred_cat == "1") = "covid";
+YPred_cat(YPred_cat == "2") = "noncovid";
+
+% Calculate accuracy.
+accuracy = mean(YPred_cat == YTest);
+
+% Get confusion matrix values.
+conf_values = confusionmat(YTest, YPred_cat);
 
 % Get true positive, false negative, false positive
 TP = conf_values(1,1);
 FN = conf_values(1,2);
-FP = conf_values(2,1);
-TN = conf_values(2,2);
+FP = 0;
+TN = 0;
 
+combined_mat = [TP, FN ; FP, TN]
 % Calculate Recall, precision, fscore
 Recall = TP /(TP + FN);
 if isnan(Recall)
@@ -188,17 +183,10 @@ end
 
 % Create confusion chart.
 figure
-conf_values = confusionchart(YTest, YPred,'RowSummary','row-normalized','ColumnSummary','column-normalized')
+conf = confusionchart(combined_mat,["Covid", "Non-covid"],'RowSummary','row-normalized','ColumnSummary','column-normalized');
+% conf_values = confusionchart(YTest, YPred_cat,'RowSummary','row-normalized','ColumnSummary','column-normalized')
+
 accuracy
 FScore
-
-
-
-
-
-
-
-
-
 
 end
