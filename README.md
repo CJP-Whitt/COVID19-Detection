@@ -7,8 +7,8 @@ Images set used for all training and validation available here: https://drive.go
 To run most of the files, you would have to stay inside the COVID19_Detection directory on MATLAB and access   
 the other files by clicking the + symbol next to the folders and then clicking the file from there.  
 
-SURF_SVM.m: extracts features using the SURF method.  
-splitData.mlx: Splits the UCSD data into training, testing, and validation directories.  
+- SURF_SVM.m: extracts features using the SURF method.  
+- splitData.mlx: Splits the UCSD data into training, testing, and validation directories.  
 pham_code.mlx: The code the nature overview paper used for transfer learning with a 80/20 random data split.  
 leaveOneOutSetup.m: Put's one patient's images into a testing directory and the rest into a training directory.  
 uscd_Data: contains testing/training/validation data splits for UCSD data.  
