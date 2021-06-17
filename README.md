@@ -1,6 +1,6 @@
 Project for finding cases of possible COVID19 induced viral pneumonia.
 
-## For an abstract overview of the project, check out our final results [presentation](https://github.com/whittyman98/COVID19-Detection/blob/main/COVID19%20Final%20Presentation.pdf).
+#### For an abstract overview of the project, check out our final results [presentation](https://github.com/whittyman98/COVID19-Detection/blob/main/COVID19%20Final%20Presentation.pdf)
 
 # Training/Validation Dataset
 Images set used for all training and validation available here: https://drive.google.com/file/d/1xn-7_PvUr9fiCDt0f6hCBcftW2ZG2TXo/view?usp=sharing
